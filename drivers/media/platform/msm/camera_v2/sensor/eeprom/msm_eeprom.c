@@ -270,7 +270,7 @@ static int msm_eeprom_power_up(struct msm_eeprom_ctrl_t *e_ctrl, bool *down)
 	int rc = 0;
 	rc = msm_eeprom_match_id(e_ctrl);
   pr_warn("%s : E", __func__);
-  
+
 	if (rc < 0) {
 		 if (down) *down = true;
 		rc = msm_camera_power_up(&e_ctrl->eboard_info->power_info,
@@ -388,7 +388,7 @@ static int eeprom_config_read_compressed_data(struct msm_eeprom_ctrl_t *e_ctrl,
   rc = e_ctrl->i2c_client.i2c_func_tbl->i2c_read_seq(
     &(e_ctrl->i2c_client), cdata->cfg.read_data.addr,
     buf_comp, cdata->cfg.read_data.comp_size);
-  
+
   if (rc < 0) {
     pr_err("%s: failed to read data, rc %d\n", __func__, rc);
     goto POWER_DOWN;
@@ -494,7 +494,7 @@ static int eeprom_config_write_data(struct msm_eeprom_ctrl_t *e_ctrl,
   		&(e_ctrl->i2c_client), cdata->cfg.write_data.addr,
   		compressed_buf, compressed_size);
 
-    //  write CRC32 for compressed data    
+    //  write CRC32 for compressed data
   	rc |= e_ctrl->i2c_client.i2c_func_tbl->i2c_write_seq(
   	  &(e_ctrl->i2c_client), cdata->cfg.write_data.addr+compressed_size,
   		(uint8_t *)&crc, 4);
@@ -543,15 +543,22 @@ static int msm_eeprom_config(struct msm_eeprom_ctrl_t *e_ctrl,
 	struct msm_eeprom_cfg_data *cdata =
 		(struct msm_eeprom_cfg_data *)argp;
 	int rc = 0;
+	size_t length = 0;
 
 	CDBG("%s E\n", __func__);
 	switch (cdata->cfgtype) {
 	case CFG_EEPROM_GET_INFO:
     pr_info("%s E CFG_EEPROM_GET_INFO\n", __func__);
     cdata->is_supported = e_ctrl->is_supported;
+		length = strlen(e_ctrl->eboard_info->eeprom_name) + 1;
+		if (length > MAX_EEPROM_NAME) {
+			pr_err("%s:%d invalid eeprom name length %d\n",
+				__func__, __LINE__, (int)length);
+			rc = -EINVAL;
+			break;
+		}
     memcpy(cdata->cfg.eeprom_name,
-    	e_ctrl->eboard_info->eeprom_name,
-    	sizeof(cdata->cfg.eeprom_name));
+    	e_ctrl->eboard_info->eeprom_name, length);
     break;
 	case CFG_EEPROM_GET_CAL_DATA:
 		pr_info("%s E CFG_EEPROM_GET_CAL_DATA\n", __func__);
@@ -1391,4 +1398,3 @@ module_init(msm_eeprom_init_module);
 module_exit(msm_eeprom_exit_module);
 MODULE_DESCRIPTION("MSM EEPROM driver");
 MODULE_LICENSE("GPL v2");
-
