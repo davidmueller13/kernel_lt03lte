@@ -2993,10 +2993,10 @@ static int rt_fill_info(struct net *net,
 	struct rtable *rt = skb_rtable(skb);
 	struct rtmsg *r;
 	struct nlmsghdr *nlh;
-	struct flowi4 *fl4 = &(inet_sk(skb->sk))->cork.fl.u.ip4;
-	unsigned long expires = 0;
-	const struct inet_peer *peer = rt->peer;
-	u32 id = 0, ts = 0, tsage = 0, error;
+//	struct flowi4 *fl4 = &(inet_sk(skb->sk))->cork.fl.u.ip4;
+//	unsigned long expires = 0;
+//	const struct inet_peer *peer = rt->peer;
+//	u32 id = 0, ts = 0, tsage = 0, error;
 
 	nlh = nlmsg_put(skb, pid, seq, event, sizeof(*r), flags);
 	if (nlh == NULL)
@@ -3038,10 +3038,10 @@ static int rt_fill_info(struct net *net,
 	if (rt->rt_dst != rt->rt_gateway)
 		NLA_PUT_BE32(skb, RTA_GATEWAY, rt->rt_gateway);
 
-	if (rtnetlink_put_metrics(skb, dst_metrics_ptr(&rt->dst)) < 0)
+//	if (rtnetlink_put_metrics(skb, dst_metrics_ptr(&rt->dst)) < 0)
 		goto nla_put_failure;
 
-	if (rt->rt_mark)
+/*	if (rt->rt_mark)
 		NLA_PUT_BE32(skb, RTA_MARK, rt->rt_mark);
 
 	if (!uid_eq(fl4->flowi4_uid, INVALID_UID) &&
@@ -3094,7 +3094,7 @@ static int rt_fill_info(struct net *net,
 			       expires, error) < 0)
 		goto nla_put_failure;
 
-	return nlmsg_end(skb, nlh);
+	return nlmsg_end(skb, nlh);*/
 
 nla_put_failure:
 	nlmsg_cancel(skb, nlh);
